@@ -3,6 +3,9 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+import scipy.fftpack
+import matplotlib.dates as mdates
+
 
 def waitResponse(char):
     # Wait for response from Arduino while toggling iris
@@ -16,6 +19,8 @@ def waitResponse(char):
 # Length of test in seconds
 test_time = 10.0
 
+# Enable FFT graph
+fft_enable = False
 
 # Initalize serial connection
 ser = serial.Serial('COM4', 115200)
@@ -96,13 +101,53 @@ sps = len(data_array) / test_duration
 
 print 'Calculated SPS: ', sps
 
-# Calculate times from counter values
-#times_array = times_array/sps
-
 print data_array[0:10]
 print 'max:', max(data_array)
+
+
+# Plot data
+
+if fft_enable:
+    fig, ax = plt.subplots()
+    fig.subplots_adjust(hspace=.3)
+    plt.subplot(2, 1, 1)
+
+# Labels
+plt.title('Lightcurve')
+plt.xlabel('Time (s)')
+plt.ylabel('ADU')
 plt.plot(times_array, data_array)
 
 plt.ylim((0, 256*256))
-#plt.ylim((0, 4096))
+
+# Modify tick number and enagle grid
+myFmt = mdates.DateFormatter('%S')
+ax = plt.gca()
+ax.xaxis.set_major_formatter(myFmt)
+ax.grid(True)
+
+
+# FFT
+if fft_enable:
+    plt.subplot(2, 1, 2)
+    plt.title('FFT')
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Amplitude')
+
+    # Number of samplepoints
+    N = len(data_array)
+
+    # sample spacing
+    T = 1.0 / sps
+    x = np.linspace(0.0, N*T, N)
+    
+    y = data_array
+    yf = scipy.fftpack.fft(y)
+    xf = np.linspace(0.0, 1.0/(2.0*T), N/2)
+
+    fft_amplitude = 2.0/N * np.abs(yf[0:N/2])
+    plt.plot(xf, fft_amplitude)
+    plt.ylim((0, max(fft_amplitude[5:])))
+
+
 plt.show()
