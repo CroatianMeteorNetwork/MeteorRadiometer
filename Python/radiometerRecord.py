@@ -112,7 +112,8 @@ def writeData(file_name, times_array, data_array):
 if __name__ == '__main__':
 
     # Record duration in hours
-    record_duration = 30.0/60/60.0 #hrs
+    #record_duration = 30.0/60/60.0 #hrs
+    record_duration = 8 #hrs
 
     # Duration of a single time clock in seconds
     data_block_time = 10.24 #s
