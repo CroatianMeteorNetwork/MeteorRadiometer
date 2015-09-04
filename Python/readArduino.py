@@ -1,3 +1,6 @@
+
+# Script for taking a few seconds of samples from the Radiometer and showing it on the screen
+
 import serial
 import time
 import matplotlib.pyplot as plt

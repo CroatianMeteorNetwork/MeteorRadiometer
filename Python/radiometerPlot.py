@@ -1,3 +1,9 @@
+
+# Plots all radiometer format CSV files into plots
+# Modify the csv_directory varibale to tell the script where are the raw radiometer CSV files
+
+
+
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,11 +41,16 @@ def loadData(file_name):
 
     return time_data, value_data
 
+
+
 if __name__ == '__main__':
 
-    plot_dir = 'plots'
 
+    # Where are the CSV files relative to the script
     csv_directory = '2015082223 Pula'
+
+    # Directory where to output the plots
+    plot_dir = 'plots'
 
     #Make plot dir
     mkdir_p(csv_directory + os.sep + plot_dir)

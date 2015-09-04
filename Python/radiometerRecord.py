@@ -1,3 +1,8 @@
+
+# Record data from the radiometer into CSV files
+# Modify the port = 'COM4' variable to your COM port
+# Define recording length by changing the record_duration variable value
+
 import serial
 import time
 import datetime
