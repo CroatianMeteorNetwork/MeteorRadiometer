@@ -32,11 +32,8 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 # Input and output file names
-input_file_name = '2016-03-16_03.17.18.178.csv'
+input_file_name = '2016-03-16_03.17.18.18.csv'
 parameters_output_file = 'parameters.txt'
-
-# Samples per second of the ADC
-sps = 500
 
 # Base frequency of the noise
 base_freq = 2*np.pi*50
@@ -131,7 +128,10 @@ def loadCSV(file_name):
     # Convert x_data from string date format to seconds from the beginning of the file
     time_list = []
     for entry in x_data:
-        time_list.append(datetime.datetime.strptime(entry, '%Y%m%d-%H%M%S.%f'))
+        if '.' in entry:
+            time_list.append(datetime.datetime.strptime(entry, '%Y%m%d-%H%M%S.%f'))
+        else:
+            time_list.append(datetime.datetime.strptime(entry, '%Y%m%d-%H%M%S'))
 
     # Normalize so that the first point is 0 seconds and convert all data to seconds from the beginning
     first_date = time_list[0]
@@ -154,6 +154,16 @@ def saveCSV(file_name, x_data, y_data):
         for i in range(len(x_data)):
             f.write('{:.6f}'.format(x_data[i]) + ',' + '{:06.6f}'.format(y_data[i]) + '\n')
 
+
+def getRangeIndices(x_data, range_min, range_max):
+    """ Gets indices of the boundary array elements that are above range_min and below range_max. """
+
+    values_in_range = np.where((x_data > range_min) & (x_data < range_max))
+    ind_min = values_in_range[0][0]
+    ind_max = values_in_range[0][-1]
+
+    return ind_min, ind_max
+
     
 
 # Load the CSV file
@@ -164,9 +174,12 @@ x_data, y_data = loadCSV(input_file_name)
 # Initial guess
 p0 = [np.mean(y_data), 1, base_freq, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
 
+# Get range indices
+sample_range_beg_ind, sample_range_end_ind = getRangeIndices(x_data, sample_range_beg, sample_range_end)
+
 # Fit on part of the data data (initial guess refinement)
-popt, pcov = curve_fit(func, x_data[int(sample_range_beg*sps) : int(sample_range_end*sps)], 
-    y_data[int(sample_range_beg*sps) : int(sample_range_end*sps)], p0, maxfev = 10000)
+popt, pcov = curve_fit(func, x_data[sample_range_beg_ind : sample_range_end_ind], 
+    y_data[sample_range_beg_ind : sample_range_end_ind], p0, maxfev = 10000)
 
 print 'Sample parameters: '
 printParameters(popt)
@@ -179,9 +192,12 @@ plotResult(x_data, y_data, func, popt, highlight=True, highlight_min=sample_rang
 
 ### FIT ON ALL DATA POINTS ###
 
+# Get range indices
+full_range_beg_ind, full_range_end_ind = getRangeIndices(x_data, full_range_beg, full_range_end)
+
 # Fit all data with approximated parameters
-popt, pcov = curve_fit(func, x_data[int(full_range_beg*sps) : int(full_range_end*sps)], 
-    y_data[int(full_range_beg*sps) : int(full_range_end*sps)], popt, maxfev = 10000)
+popt, pcov = curve_fit(func, x_data[full_range_beg_ind : full_range_end_ind], 
+    y_data[full_range_beg_ind : full_range_end_ind], popt, maxfev = 10000)
 
 print 'Final parameters: '
 printParameters(popt)
