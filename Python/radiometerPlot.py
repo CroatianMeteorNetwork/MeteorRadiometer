@@ -37,7 +37,7 @@ def loadData(file_name):
     time_data, value_data = np.hsplit(data, 2)
 
     # Convert time string to datetime object
-    time_data = datestr2datetime(time_data)
+    # time_data = datestr2datetime(time_data)
 
     return time_data, value_data
 
