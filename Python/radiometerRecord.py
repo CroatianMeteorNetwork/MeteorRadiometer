@@ -236,6 +236,11 @@ if __name__ == '__main__':
     # Define the used Arduino port
     arduino_port = 'COM4'
 
+    # Geographical coordinates of the radiometric station
+    latitude = 44.869509 # N
+    longitude = 13.853925 # E
+    elevation = 23 # meters
+
     # Duration of a single time block in seconds
     data_block_time = 10.24 #s
 
@@ -257,7 +262,7 @@ if __name__ == '__main__':
 
     while True:
         if counter == 0:
-            start_time, duration = wordDayDuration(44.869509, 13.853925, 23)
+            start_time, duration = wordDayDuration(latitude, longitude, elevation)
 
             # Recalculate the duration to seconds from hours
             duration = duration*60*60

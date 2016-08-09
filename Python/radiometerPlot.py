@@ -75,7 +75,7 @@ if __name__ == '__main__':
             plt.ylabel('ADU')
 
             # Set Y limits
-            plt.ylim((0, 256*256))
+            plt.ylim((0, 2**16))
 
             # Modify tick number and enable grid
             myFmt = mdates.DateFormatter('%S')
