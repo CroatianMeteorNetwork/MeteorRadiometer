@@ -34,6 +34,8 @@ import errno
 import shutil
 from subprocess import call
 
+from nightAnalyzer import analyze
+
 
 
 def mkdirp(path):
@@ -301,6 +303,16 @@ if __name__ == '__main__':
             # Close conection if this is the last recording run
             if counter == 0:
                 closeConnection(ser)
+
+                # Wait a bit before analyzing
+                time.sleep(5)
+
+                print 'Running the night statistics...'
+                
+                # Run the night statistics analysis
+                analyze(night_folder)
+
+                print 'Statistics done!'
 
                 # Wait a bit before recalculating the new start time
                 time.sleep(5*60)
