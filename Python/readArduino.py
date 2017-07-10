@@ -6,18 +6,20 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
-import scipy.fftpack
 import matplotlib.dates as mdates
 
 
 def waitResponse(char):
-    # Wait for response from Arduino while toggling iris
+    """ Wait for response from Arduino while toggling iris. """
+
     while 1:
         print 'Waiting...'
         time.sleep(0.2)
         ser.write(char)
+
         if "Response" in ser.readline():
             break
+
 
 # Length of test in seconds
 test_time = 10.0
@@ -26,7 +28,7 @@ test_time = 10.0
 fft_enable = False
 
 # Initalize serial connection
-ser = serial.Serial('COM4', 115200)
+ser = serial.Serial('COM3', 115200)
 
 # Wait for initialization
 time.sleep(2)
@@ -39,9 +41,10 @@ time.sleep(2)
 
 print 'Connected!'
 
-data_array = np.array([], dtype=np.uint16)
-#times_array = np.array([], dtype=np.float32)
-times_array = np.array([])
+data_array = []
+times_array = []
+
+
 counter = 0
 
 # Flush input buffer
@@ -49,7 +52,6 @@ ser.flushInput()
 
 first_read = True 
 while 1:
-    #start_time = time.clock()
     
     if not first_read:
         if (time.clock() - test_start >= test_time):
@@ -74,11 +76,9 @@ while 1:
         # Add value to data list
         try:
 
-            # Numpy arrays
-            #data_array = np.append(data_array, [4096-serial_value])
-            data_array = np.append(data_array, [serial_value])
-            #times_array = np.append(times_array, [counter])
-            times_array = np.append(times_array, [datetime.datetime.utcnow()])
+            # Add data to arrays
+            data_array.append(serial_value)
+            times_array.append(datetime.datetime.utcnow())
 
             counter += 1
 
@@ -86,8 +86,6 @@ while 1:
             print 'Error!'
             print serial_value
             break
-        # Add time to list
-        #times_list.append(time.clock() - test_start)
 
 test_duration = time.clock() - test_start
 
@@ -111,6 +109,7 @@ print 'max:', max(data_array)
 # Plot data
 
 if fft_enable:
+    import scipy.fftpack
     fig, ax = plt.subplots()
     fig.subplots_adjust(hspace=.3)
     plt.subplot(2, 1, 1)
