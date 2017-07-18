@@ -5,6 +5,7 @@
 
 
 import os
+import errno
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
@@ -23,7 +24,8 @@ def mkdir_p(path):
 def datestr2datetime(date_str):
     """ Converts date string to datetime object. """
 
-    return datetime.datetime.strptime(date_str, "%Y%m%d-%H%M%S.%f")
+    return datetime.datetime.strptime(date_str, "%Y-%m-%d_%H.%M.%S.%f")
+
 
 def loadData(file_name):
     """ Load data from a file. """
@@ -47,7 +49,7 @@ if __name__ == '__main__':
 
 
     # Where are the CSV files relative to the script
-    csv_directory = '2015082223 Pula'
+    csv_directory = '2017071718'
 
     # Directory where to output the plots
     plot_dir = 'plots'
@@ -59,11 +61,24 @@ if __name__ == '__main__':
 
         if '.csv' in file_name:
 
+            # Read beginning time from file name
+            #2017-07-18_00.07.19.324000
+            beg_time = datestr2datetime(file_name.replace('.csv', ''))
+
             # Load data
             time_data, value_data = loadData(csv_directory + os.sep + file_name)
 
+            datetime_data = []
+
+            for t in time_data:
+                
+                # Calculate datetime of every data point
+                t = beg_time + datetime.timedelta(seconds=float(t[0]))
+
+                datetime_data.append(t)
+
             # Plot data
-            plt.plot(time_data, value_data)
+            plt.plot(datetime_data, value_data)
 
             plot_name = '.'.join(file_name.split('.')[:-2])
 
