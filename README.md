@@ -31,3 +31,9 @@ Work to be done:
 - pack everything into a nifty little box
 - write software for fireball detection
 - make the software more user friendly
+
+
+## Citations
+
+For academic use, please cite the paper:
+> Vida, D., Turčinov, R., Šegon, D., & Silađi, E. (2015). *Low-cost meteor radiometer*. **In Proceedings of the International Meteor Conference, Mistelbach, Austria**, pp. 27-30.
