@@ -11,6 +11,8 @@ import nightAnalyzer
 import shutil
 from subprocess import call
 
+
+
 def work_day_duration(lat, lon, elevation):
     #Function that calculates start time and duration of capturing
     #Reqiured inputs: Latitude, longitude, elevation
@@ -53,7 +55,7 @@ def work_day_duration(lat, lon, elevation):
 
     duration=round(duration.total_seconds()/60/60, 2)
 
-    return (start_time, duration)
+    return (start_time, duration, next_rise)
 
 # function that returns number of millisecnds since epohe
 curr_micro_time = lambda: int(round(time.time() * 1000000))
@@ -211,18 +213,29 @@ while True:
     if counter <= 0:
         start_time = work_day_duration(44.869509, 13.853925, 23)[0] 
         if  start_time == True:
-            rising = ephem.localtime(ephem.Observer().next_rising(ephem.Sun()))
-            counter = ((rising - datetime.datetime.utcnow()).total_seconds()) / data_block_time
+            rising = work_day_duration(44.869509, 13.853925, 23)[2] 
+            counter = ((rising - datetime.datetime.now()).total_seconds()) / data_block_time
         
         else:
             if analyze:
                 print "Analyzing..."
                 logging.info("Analyzing...")
                 nightAnalyzer.analyze()
-                analyze = False   
-            print 'Waiting ' + str(int((start_time - datetime.datetime.now()).total_seconds())) + ' seconds.'
-            logging.info('Waiting ' + str(int((start_time - datetime.datetime.now()).total_seconds())) + ' seconds.')
-            time.sleep(int((start_time - datetime.datetime.now()).total_seconds())+60)
+                analyze = False  
+            sleep_done = False
+            while not sleep_done:
+                sleep_time = int((start_time - datetime.datetime.now()).total_seconds())+60
+                if sleep_time < 3600:
+                    sleep_done = True
+                    print 'Waiting ' + str(int((start_time - datetime.datetime.now()).total_seconds())) + ' seconds.'
+                    logging.info('Waiting ' + str(int((start_time - datetime.datetime.now()).total_seconds())) + ' seconds.')
+                    time.sleep(int((start_time - datetime.datetime.now()).total_seconds())+60)
+                else:
+                    print 'Waiting for an hour'
+                    logging.info('Waiting for an hour')
+                    time.sleep(3600)
+
+
     
     else:
         counter -= 1
